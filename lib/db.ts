@@ -16,7 +16,7 @@ export async function getToken() {
   }
 
   const signer = new Signer({
-    hostname: process.env.DBHOST!,
+    hostname: process.env.PGHOST!,
     port: Number(process.env.PGPORT),
     username: process.env.PGUSER!,
     region: process.env.AWS_REGION!,
@@ -53,7 +53,7 @@ export async function getConnection(): Promise<Pool> {
     const token = await getToken();
 
     pool = new Pool({
-      host: process.env.DBHOST!,
+      host: process.env.PGHOST!,
       user: process.env.PGUSER!,
       password: token,
       database: 'postgres',
