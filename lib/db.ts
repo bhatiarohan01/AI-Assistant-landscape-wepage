@@ -53,7 +53,7 @@ export async function getConnection(): Promise<Pool> {
     const token = await getToken();
 
     pool = new Pool({
-      host: process.env.PGHOST!,
+      host: process.env.DBHOST!,
       user: process.env.PGUSER!,
       password: token,
       database: 'postgres',
