@@ -1,0 +1,15 @@
+{
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "PGHOST": "@pghost",
+    "PGPORT": "@pgport", 
+    "PGUSER": "@pguser",
+    "PGDATABASE": "@pgdatabase",
+    "AWS_REGION": "@aws_region",
+    "AWS_ROLE_ARN": "@aws_role_arn"
+  }
+}
