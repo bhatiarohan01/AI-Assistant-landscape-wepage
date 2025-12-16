@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Code, Globe, Terminal, Laptop, Zap, Cloud, FileCode, Bot, Sparkles } from 'lucide-react';
+import { Code, Globe, Terminal, Laptop, Zap, Cloud, FileCode, Bot, Sparkles, Search } from 'lucide-react';
 
 interface Tool {
   id: number;
@@ -39,6 +39,7 @@ const AICodeToolsLandscape = () => {
   const [categories, setCategories] = useState<Record<string, Category>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -80,6 +81,21 @@ const AICodeToolsLandscape = () => {
     ? Object.entries(categories)
     : Object.entries(categories).filter(([key]) => key === selectedCategory);
 
+  // Filter categories and tools based on search query
+  const searchFilteredCategories = filteredCategories.map(([key, category]) => {
+    if (!searchQuery.trim()) {
+      return [key, category] as [string, Category];
+    }
+    
+    const filteredTools = category.tools.filter((tool: Tool) =>
+      tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.pricing.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    return [key, { ...category, tools: filteredTools }] as [string, Category];
+  }).filter(([, category]) => category.tools.length > 0);
+
   const totalTools = Object.values(categories).reduce((sum, cat) => sum + cat.tools.length, 0);
 
   return (
@@ -95,7 +111,7 @@ const AICodeToolsLandscape = () => {
         </div>
 
         {/* Category Filter */}
-        <div className="mb-8 flex flex-wrap gap-3 justify-center">
+        <div className="mb-6 flex flex-wrap gap-3 justify-center">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
@@ -125,9 +141,42 @@ const AICodeToolsLandscape = () => {
           })}
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-8 max-w-md mx-auto">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Search tools by name, description, or pricing..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-slate-800/50 backdrop-blur border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <div className="mt-2 text-center text-sm text-gray-400">
+              {searchFilteredCategories.reduce((total, [, category]) => total + category.tools.length, 0)} tools found
+            </div>
+          )}
+        </div>
+
         {/* Categories Grid */}
         <div className="space-y-8">
-          {filteredCategories.map(([key, category]) => {
+          {searchFilteredCategories.length === 0 && searchQuery ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-lg mb-2">No tools found</div>
+              <div className="text-gray-500 text-sm">Try adjusting your search terms</div>
+            </div>
+          ) : (
+            searchFilteredCategories.map(([key, category]) => {
             const IconComponent = iconMap[category.icon as keyof typeof iconMap];
             return (
               <div key={key} className="bg-slate-800/50 backdrop-blur rounded-2xl p-6 border border-slate-700">
@@ -171,7 +220,8 @@ const AICodeToolsLandscape = () => {
                 </div>
               </div>
             );
-          })}
+          })
+          )}
         </div>
 
         {/* Stats Footer */}
