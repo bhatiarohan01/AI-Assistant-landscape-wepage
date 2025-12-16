@@ -16,7 +16,7 @@ export async function getToken() {
   }
 
   const signer = new Signer({
-    hostname: process.env.PGHOST!,
+    hostname: process.env.DBHOST!,
     port: Number(process.env.PGPORT),
     username: process.env.PGUSER!,
     region: process.env.AWS_REGION!,
